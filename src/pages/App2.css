@@ -1,0 +1,229 @@
+/* General Reset and Layout */
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background-color: #242423;
+}
+
+.container {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 1rem;
+  position: relative;
+}
+
+/* Header Styles */
+.header {
+  width: 100%;
+  max-width: 64rem; /* 1024px */
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #333533;
+  padding: 1rem 1.5rem;
+  border-radius: 0.5rem;
+  text-decoration: none;
+}
+
+.logo {
+  color: #ffeb3b;
+  font-size: 1.5rem;
+  font-weight: bold;
+  text-decoration: none;
+}
+
+.nav a {
+  margin: 0 0.5rem;
+  color: #e8eddf;
+  text-decoration: none;
+  font-size: 0.875rem; /* 14px */
+  transition: color 0.3s ease;
+}
+
+.nav a:hover {
+  color: #ffc300;
+  text-decoration: none;
+}
+
+/* Main Content Styles */
+.main {
+  text-align: center;
+  margin-top: 2rem;
+  max-width: 48rem; /* 768px */
+  transition: margin 0.3s ease; /* Add smooth transition */
+}
+
+.title2 {
+  font-size: 1.5rem; /* 24px */
+  font-weight: bold;
+  color: #e8eddf;
+  margin-top: 10%;
+  margin-bottom: 5rem;
+  transition: margin 0.3s ease; /* Smooth margin transition */
+}
+
+.subtitle2 {
+  color: #f9f7f3;
+  font-size: 1.2rem; /* 16px */
+  margin-bottom: 5rem;
+  transition: margin 0.3s ease; /* Smooth margin transition */
+}
+
+/* Adjust margins when file is uploaded */
+.file-uploaded .title2 {
+  margin-top: 5%; /* Reduce top margin */
+}
+
+.file-uploaded .subtitle2 {
+  margin-bottom: 3rem; /* Reduce bottom margin */
+}
+
+input[type="file"] {
+  display: none;
+}
+
+/* File Upload Button Styling */
+.upload-label {
+  padding: 0.75rem 2rem;
+  background-color: #ffeb3b;
+  color: #080808;
+  font-size: 1rem;
+  font-weight: bold;
+  border: none;
+  border-radius: 0.3125rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+/* Background Design */
+.background-design {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 17rem; /* 200px */
+  background-color: #ffeb3b;
+  opacity: 1;
+  border-bottom-left-radius: 50%;
+  border-bottom-right-radius: 50%;
+  z-index: -1;
+  clip-path: ellipse(80% 50% at 50% 0%);
+}
+
+/* Layout and Orientation Settings */
+.orientation, .copies {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 1.5rem;
+  gap: 1rem;
+  width: 100%;
+  font-size: 1rem;
+}
+
+.orientation p, .copies p {
+  color: #ffeb3b;
+  font-weight: bold;
+  margin: 0.5rem; /* Remove default margins for better alignment */
+  white-space: nowrap;
+}
+
+select, input[type="number"] {
+  width: 100%;
+  max-width: 15rem; /* Limit input and select width for a neat appearance */
+  padding: 0.5rem;
+  font-size: 1rem;
+  color: #080808;
+  background-color: #fafff0;
+  border: 1px solid #ddd;
+  border-radius: 0.3125rem;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+select:focus, input[type="number"]:focus {
+  border-color: #ffeb3b;
+  box-shadow: 0 0 5px #ffeb3b;
+  outline: none;
+}
+
+button {
+  padding: 0.75rem 2rem;
+  margin-top: 2rem;
+  background-color: #ffeb3b;
+  color: #080808;
+  font-size: 1rem;
+  font-weight: bold;
+  border: none;
+  border-radius: 0.3125rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+button:hover {
+  background-color: #ffc300;
+}
+
+/* PDF Preview Styles */
+.pdf-preview {
+  width: 100%;
+  max-width: 100%;
+  max-height: 60vh; /* Allow scroll if multiple pages */
+  margin: 2rem 0;
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  overflow-y: auto; /* Vertical scroll */
+}
+
+/* Style each canvas (PDF pages) */
+.pdf-canvas {
+  margin-bottom: 1rem;
+  width: 100%;
+  max-width: 90%; /* Make sure it fits inside the container */
+  margin: 0 auto; /* Center the canvas */
+}
+
+/* Scroll bar styling */
+.pdf-preview::-webkit-scrollbar {
+  width: 10px;
+}
+
+.pdf-preview::-webkit-scrollbar-thumb {
+  background-color: #888;
+  border-radius: 5px;
+}
+
+.pdf-preview::-webkit-scrollbar-thumb:hover {
+  background-color: #555;
+}
+
+.pdf-preview::-webkit-scrollbar-track {
+  background-color: #f1f1f1;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+  .container {
+    padding: 1rem;
+  }
+
+  .main {
+    padding: 0 1rem; /* Padding adjustment */
+  }
+
+  .pdf-preview {
+    max-height: 70vh; /* Allow more space for previews on small screens */
+  }
+
+  .pdf-canvas {
+    max-width: 100%; /* Make canvas fully responsive */
+  }
+}
