@@ -105,3 +105,23 @@ body {
   z-index: -1;
   clip-path: ellipse(100% 100% at 50% 50%);
 }
+.pdf-container {
+  position: relative; /* Set the container to relative positioning */
+  margin-bottom: 20px;
+  padding: 10px;
+  border: 1px solid #ddd; /* Optional: Add border to PDF container */
+  border-radius: 8px;
+  background-color: #f9f9f9;
+}
+
+.remove-pdf-btn {
+  position: absolute; /* Position button absolutely within the container */
+  top: -2.2rem;
+  right: -1rem;
+  background: transparent;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+  color: red;
+}
+
