@@ -4,45 +4,42 @@ import "./App2.css"; // Your custom styles
 import * as pdfjsLib from "pdfjs-dist/webpack";
 
 const Editor = () => {
-  const [pdfFile, setPdfFile] = useState(null);
-  const [pdfDoc, setPdfDoc] = useState(null); // To store the loaded PDF document
+  const [pdfFiles, setPdfFiles] = useState([]); // To store multiple PDF files
+  const [pdfDocs, setPdfDocs] = useState([]); // To store loaded PDF documents
   const [fileUploaded, setFileUploaded] = useState(false); // Track file upload status
-  const canvasRefs = useRef([]); // References for each page's canvas
+  const canvasRefs = useRef({}); // References for each page's canvas
 
   const handleFileUpload = (event) => {
-    const file = event.target.files[0];
-    if (file && file.type === "application/pdf") {
-      const fileReader = new FileReader();
-      fileReader.onload = () => {
-        const blob = new Blob([fileReader.result], { type: "application/pdf" });
-        setPdfFile(URL.createObjectURL(blob));
-        setFileUploaded(true); // Mark file as uploaded
-      };
-      fileReader.readAsArrayBuffer(file);
-    } else {
-      alert("Please upload a valid PDF file.");
-    }
+    const files = Array.from(event.target.files);
+    const pdfUrls = files.map((file) => URL.createObjectURL(file));
+    setPdfFiles((prevFiles) => [...prevFiles, ...pdfUrls]); // Append new files to existing files
+    setFileUploaded(true); // Mark file as uploaded
   };
 
   useEffect(() => {
-    if (pdfFile) {
-      const loadingTask = pdfjsLib.getDocument(pdfFile);
-      loadingTask.promise
-        .then((pdf) => {
-          setPdfDoc(pdf);
-          renderAllPages(pdf);
+    if (pdfFiles.length > 0) {
+      const loadingTasks = pdfFiles.map((pdfFile) =>
+        pdfjsLib.getDocument(pdfFile).promise
+      );
+
+      Promise.all(loadingTasks)
+        .then((loadedPdfs) => {
+          setPdfDocs(loadedPdfs);
+          loadedPdfs.forEach((pdf, pdfIndex) => {
+            renderAllPages(pdf, pdfIndex); // Render all pages for each PDF
+          });
         })
         .catch((error) => {
-          console.error("Error loading PDF:", error);
+          console.error("Error loading PDFs:", error);
         });
     }
-  }, [pdfFile]);
+  }, [pdfFiles]);
 
-  const renderPage = (pdf, pageNumber) => {
+  const renderPage = (pdf, pageNumber, pdfIndex) => {
     pdf.getPage(pageNumber).then((page) => {
       const scale = 1.5; // Adjust for zoom level
       const viewport = page.getViewport({ scale });
-      const canvas = canvasRefs.current[pageNumber - 1];
+      const canvas = canvasRefs.current[`${pdfIndex}-${pageNumber - 1}`];
       const context = canvas.getContext("2d");
 
       // Set canvas dimensions to match the PDF page
@@ -58,9 +55,9 @@ const Editor = () => {
     });
   };
 
-  const renderAllPages = (pdf) => {
+  const renderAllPages = (pdf, pdfIndex) => {
     for (let i = 1; i <= pdf.numPages; i++) {
-      renderPage(pdf, i);
+      renderPage(pdf, i, pdfIndex);
     }
   };
 
@@ -77,10 +74,8 @@ const Editor = () => {
       </header>
 
       <main className={`main ${fileUploaded ? "file-uploaded" : ""}`}>
-        <h1 className="title2"> PDF Upload Page</h1>
-        <p className="subtitle2">
-          Upload and view your PDF files.
-        </p>
+        <h1 className="title2">PDF Upload Page</h1>
+        <p className="subtitle2">Upload and view your PDF files.</p>
 
         {/* File Upload */}
         <form>
@@ -94,6 +89,7 @@ const Editor = () => {
             accept="application/pdf"
             onChange={handleFileUpload}
             className="file-input"
+            multiple // Allow multiple file selection
           />
         </form>
 
@@ -110,23 +106,30 @@ const Editor = () => {
 
             <div className="copies">
               <p htmlFor="copies">Copies:</p>
-              <input type="number" id="copies" name="copies" min="1" required />
+              <input type="number" id="copies" name="copies" min="1" defaultValue="1" required />
             </div>
 
-            <button type="submit">Generate PDF</button>
+            <button type="submit">Submit</button>
           </div>
         )}
       </main>
 
       {/* PDF Preview with Scrollable Container */}
-      {pdfDoc && (
+      {pdfDocs.length > 0 && (
         <div className="pdf-preview">
-          {Array.from({ length: pdfDoc.numPages }).map((_, index) => (
-            <canvas
-              key={index}
-              ref={(el) => (canvasRefs.current[index] = el)}
-              className="pdf-canvas"
-            />
+          {pdfDocs.map((pdf, pdfIndex) => (
+            <div key={pdfIndex} className="pdf-container">
+              <h2>PDF {pdfIndex + 1}</h2>
+              {/* Loop over the pages of each PDF */}
+              {Array.from({ length: pdf.numPages }).map((_, pageIndex) => (
+                <div key={`${pdfIndex}-${pageIndex}`} className="pdf-page">
+                  <canvas
+                    ref={(el) => (canvasRefs.current[`${pdfIndex}-${pageIndex}`] = el)}
+                    className="pdf-canvas"
+                  />
+                </div>
+              ))}
+            </div>
           ))}
         </div>
       )}
