@@ -16,6 +16,11 @@ const Editor = () => {
     setFileUploaded(true); // Mark file as uploaded
   };
 
+  const removePdf = (index) => {
+    setPdfFiles((prevFiles) => prevFiles.filter((_, idx) => idx !== index)); // Remove file URL
+    setPdfDocs((prevDocs) => prevDocs.filter((_, idx) => idx !== index)); // Remove the PDF document
+  };
+
   useEffect(() => {
     if (pdfFiles.length > 0) {
       const loadingTasks = pdfFiles.map((pdfFile) =>
@@ -120,6 +125,13 @@ const Editor = () => {
           {pdfDocs.map((pdf, pdfIndex) => (
             <div key={pdfIndex} className="pdf-container">
               <h2>PDF {pdfIndex + 1}</h2>
+              {/* Remove Button */}
+              <button
+                className="remove-pdf-btn"
+                onClick={() => removePdf(pdfIndex)}
+              >
+                &#10005; {/* Cross mark */}
+              </button>
               {/* Loop over the pages of each PDF */}
               {Array.from({ length: pdf.numPages }).map((_, pageIndex) => (
                 <div key={`${pdfIndex}-${pageIndex}`} className="pdf-page">
