@@ -13,13 +13,14 @@ SECRET_KEY = 'django-insecure-lvie%1(=rnr(unqyc_0u2z0!w6bpe55^*75svl)tl8j*z+!6ik
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
-CORS_ALLOWED_ORIGINS = [
-    "http://localhost:3000",  # React development server
-]
+# CORS_ALLOWED_ORIGINS = [
+#     "http://localhost:3000",
+#       'http://192.168.42.70:8000'  # React development server
+# ]
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', '192.168.42.70']
 
-CORS_ALLOWED_ORIGINS = [ "http://localhost:3000" ]
+ 
 # Application definition
 
 INSTALLED_APPS = [
@@ -50,7 +51,10 @@ MIDDLEWARE = [
 INSTALLED_APPS += ['corsheaders']
 MIDDLEWARE = ['corsheaders.middleware.CorsMiddleware'] + MIDDLEWARE
 CORS_ALLOWED_ORIGINS = [
-    'http://localhost:3000',  # React frontend
+    'http://localhost:3000',
+     "http://192.168.56.1:3000",
+     'http://192.168.42.70:8000' , 
+
 ]
 
 
