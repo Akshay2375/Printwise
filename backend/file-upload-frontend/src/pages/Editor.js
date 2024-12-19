@@ -17,18 +17,18 @@ const EditorFileUpload = () => {
   const handleFileUpload = (event) => {
     const files = Array.from(event.target.files);
     const pdfUrls = files.map((file) => URL.createObjectURL(file));
-    setPdfFiles((prevFiles) => [...prevFiles, ...pdfUrls]); // Append new files to existing files
-    setFileUploaded(true); // Mark file as uploaded
-    setFile(event.target.files[0]); // Set the selected file for upload
+    setPdfFiles((prevFiles) => [...prevFiles, ...pdfUrls]);
+    setFileUploaded(true);
+    setFile(event.target.files[0]);
   };
 
   // Handle file removal
   const removePdf = (index) => {
-    setPdfFiles((prevFiles) => prevFiles.filter((_, idx) => idx !== index)); // Remove file URL
-    setPdfDocs((prevDocs) => prevDocs.filter((_, idx) => idx !== index)); // Remove the PDF document
+    setPdfFiles((prevFiles) => prevFiles.filter((_, idx) => idx !== index));
+    setPdfDocs((prevDocs) => prevDocs.filter((_, idx) => idx !== index));
   };
 
-  // Render PDF pages when files are uploaded
+  // Render PDF pages when files or orientation are updated
   useEffect(() => {
     if (pdfFiles.length > 0) {
       const loadingTasks = pdfFiles.map((pdfFile) =>
@@ -39,24 +39,30 @@ const EditorFileUpload = () => {
         .then((loadedPdfs) => {
           setPdfDocs(loadedPdfs);
           loadedPdfs.forEach((pdf, pdfIndex) => {
-            renderAllPages(pdf, pdfIndex); // Render all pages for each PDF
+            renderAllPages(pdf, pdfIndex);
           });
         })
         .catch((error) => {
           console.error("Error loading PDFs:", error);
         });
     }
-  }, [pdfFiles]);
+  }, [pdfFiles, orientation]); // Re-render when orientation changes
 
-  // Render a single page
+  // Render a single page with orientation
   const renderPage = (pdf, pageNumber, pdfIndex) => {
     pdf.getPage(pageNumber).then((page) => {
-      const scale = 1.5; // Adjust for zoom level
-      const viewport = page.getViewport({ scale });
+      const scale = 1.5; // Base scale
+      let viewport = page.getViewport({ scale });
+
+      // Adjust the viewport for landscape orientation
+      if (orientation === "landscape") {
+        viewport = page.getViewport({ scale, rotation: 90 }); // Rotate the page
+      }
+
       const canvas = canvasRefs.current[`${pdfIndex}-${pageNumber - 1}`];
       const context = canvas.getContext("2d");
 
-      // Set canvas dimensions to match the PDF page
+      // Set canvas dimensions
       canvas.width = viewport.width;
       canvas.height = viewport.height;
 
@@ -76,7 +82,7 @@ const EditorFileUpload = () => {
     }
   };
 
-  // Submit the form data to the backend
+  // Submit form data to backend
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -90,7 +96,7 @@ const EditorFileUpload = () => {
         headers: { "Content-Type": "multipart/form-data" },
       });
 
-      console.log(response.data); // Success or error message
+      console.log(response.data);
     } catch (error) {
       console.error("Error:", error);
     }
@@ -124,11 +130,11 @@ const EditorFileUpload = () => {
             accept="application/pdf"
             onChange={handleFileUpload}
             className="file-input"
-            multiple // Allow multiple file selection
+            multiple
             required
           />
 
-          {/* Layout and Copies Section (only shown after upload) */}
+          {/* Layout and Copies Section */}
           {fileUploaded && (
             <div>
               <div className="orientation">
@@ -163,22 +169,23 @@ const EditorFileUpload = () => {
         </form>
       </main>
 
-      {/* PDF Preview with Scrollable Container */}
+      {/* PDF Preview */}
       {pdfDocs.length > 0 && (
         <div className="pdf-preview">
           {pdfDocs.map((pdf, pdfIndex) => (
             <div key={pdfIndex} className="pdf-container">
               <h2>PDF {pdfIndex + 1}</h2>
-              {/* Remove Button */}
               <button
                 className="remove-pdf-btn"
                 onClick={() => removePdf(pdfIndex)}
               >
-                &#10005; {/* Cross mark */}
+                &#10005;
               </button>
-              {/* Loop over the pages of each PDF */}
               {Array.from({ length: pdf.numPages }).map((_, pageIndex) => (
-                <div key={`${pdfIndex}-${pageIndex}`} className="pdf-page">
+                <div
+                  key={`${pdfIndex}-${pageIndex}`}
+                  className={`pdf-page ${orientation}`} // Add dynamic orientation class
+                >
                   <canvas
                     ref={(el) => (canvasRefs.current[`${pdfIndex}-${pageIndex}`] = el)}
                     className="pdf-canvas"
@@ -189,8 +196,8 @@ const EditorFileUpload = () => {
           ))}
         </div>
       )}
+            <div className="background-design"></div>
 
-      <div className="background-design"></div>
     </div>
   );
 };
